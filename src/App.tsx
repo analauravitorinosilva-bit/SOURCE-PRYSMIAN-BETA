@@ -33,6 +33,8 @@ export default function App() {
     email: '',
     registration_code: '',
     items: '',
+    address: '',
+    phone: '',
     category_id: ''
   });
 
@@ -71,7 +73,7 @@ export default function App() {
     });
     if (res.ok) {
       alert('Fornecedor cadastrado com sucesso!');
-      setNewSupplier({ name: '', email: '', registration_code: '', items: '', category_id: '' });
+      setNewSupplier({ name: '', email: '', registration_code: '', items: '', address: '', phone: '', category_id: '' });
       fetchSuppliers();
     }
   };
@@ -145,7 +147,7 @@ export default function App() {
             </div>
 
             {/* Search Bar */}
-            <div className="max-w-3xl mx-auto space-y-6">
+            <div className="max-w-3xl mx-auto space-y-8">
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                 <input 
@@ -157,23 +159,30 @@ export default function App() {
                 />
               </div>
 
-              {/* Categories Filter */}
-              <div className="flex flex-wrap gap-2 justify-center">
-                <button 
-                  onClick={() => setSelectedCategory(null)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${!selectedCategory ? 'bg-brand-accent text-white shadow-md' : 'bg-white text-slate-600 hover:bg-slate-100'}`}
-                >
-                  Todas
-                </button>
-                {categories.map(cat => (
+              {/* Categories Filter - Written List Format */}
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <Tag size={14} /> Selecione uma Categoria
+                </h4>
+                <div className="flex flex-wrap gap-x-8 gap-y-3">
                   <button 
-                    key={cat.id}
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === cat.id ? 'bg-brand-accent text-white shadow-md' : 'bg-white text-slate-600 hover:bg-slate-100'}`}
+                    onClick={() => setSelectedCategory(null)}
+                    className={`text-sm font-medium transition-all relative py-1 ${!selectedCategory ? 'text-brand-accent' : 'text-slate-500 hover:text-brand-deep'}`}
                   >
-                    {cat.name}
+                    Todas as Categorias
+                    {!selectedCategory && <motion.div layoutId="cat-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-accent rounded-full" />}
                   </button>
-                ))}
+                  {categories.map(cat => (
+                    <button 
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={`text-sm font-medium transition-all relative py-1 ${selectedCategory === cat.id ? 'text-brand-accent' : 'text-slate-500 hover:text-brand-deep'}`}
+                    >
+                      {cat.name}
+                      {selectedCategory === cat.id && <motion.div layoutId="cat-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-accent rounded-full" />}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -212,6 +221,18 @@ export default function App() {
                           <Mail size={16} className="shrink-0 text-brand-accent" />
                           <span className="truncate">{supplier.email}</span>
                         </div>
+                        {supplier.phone && (
+                          <div className="flex items-center gap-2 text-sm text-slate-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-brand-accent"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                            <span>{supplier.phone}</span>
+                          </div>
+                        )}
+                        {supplier.address && (
+                          <div className="flex items-start gap-2 text-sm text-slate-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-1 shrink-0 text-brand-accent"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span className="line-clamp-2">{supplier.address}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -328,6 +349,29 @@ export default function App() {
                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                           ))}
                         </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-sm font-bold text-slate-500">Endereço (Opcional)</label>
+                        <input 
+                          type="text" 
+                          className="input-field" 
+                          placeholder="Rua, Número, Cidade, Estado"
+                          value={newSupplier.address}
+                          onChange={e => setNewSupplier({...newSupplier, address: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-sm font-bold text-slate-500">Telefone (Opcional)</label>
+                        <input 
+                          type="text" 
+                          className="input-field" 
+                          placeholder="(00) 00000-0000"
+                          value={newSupplier.phone}
+                          onChange={e => setNewSupplier({...newSupplier, phone: e.target.value})}
+                        />
                       </div>
                     </div>
 

@@ -21,7 +21,9 @@ db.exec(`
     name TEXT NOT NULL,
     email TEXT NOT NULL,
     registration_code TEXT,
-    items TEXT, -- Comma separated or JSON
+    items TEXT,
+    address TEXT,
+    phone TEXT,
     category_id INTEGER,
     FOREIGN KEY (category_id) REFERENCES categories(id)
   );
@@ -36,10 +38,10 @@ if (categoryCount.count === 0) {
   insertCat.run("Serviços de TI");
   insertCat.run("Logística");
 
-  const insertSupp = db.prepare("INSERT INTO suppliers (name, email, registration_code, items, category_id) VALUES (?, ?, ?, ?, ?)");
-  insertSupp.run("TechFlow Solutions", "contato@techflow.com", "TF-001", "Servidores, Laptops, Redes", 3);
-  insertSupp.run("OfficeMax Pro", "vendas@officemax.com", "OM-99", "Cadeiras, Mesas, Armários", 2);
-  insertSupp.run("Global Logistics", "info@globallog.com", "GL-42", "Transporte, Armazenagem", 4);
+  const insertSupp = db.prepare("INSERT INTO suppliers (name, email, registration_code, items, address, phone, category_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
+  insertSupp.run("TechFlow Solutions", "contato@techflow.com", "TF-001", "Servidores, Laptops, Redes", "Av. Paulista, 1000, SP", "(11) 99999-9999", 3);
+  insertSupp.run("OfficeMax Pro", "vendas@officemax.com", "OM-99", "Cadeiras, Mesas, Armários", "Rua das Flores, 123, RJ", "(21) 88888-8888", 2);
+  insertSupp.run("Global Logistics", "info@globallog.com", "GL-42", "Transporte, Armazenagem", "Porto de Santos, S/N", "(13) 77777-7777", 4);
 }
 
 async function startServer() {
@@ -59,8 +61,8 @@ async function startServer() {
     const params: any[] = [];
 
     if (q) {
-      query += " AND (s.name LIKE ? OR s.items LIKE ? OR s.email LIKE ?)";
-      params.push(`%${q}%`, `%${q}%`, `%${q}%`);
+      query += " AND (s.name LIKE ? OR s.items LIKE ? OR s.email LIKE ? OR s.address LIKE ? OR s.phone LIKE ?)";
+      params.push(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`);
     }
 
     if (categoryId) {
@@ -73,10 +75,10 @@ async function startServer() {
   });
 
   app.post("/api/suppliers", (req, res) => {
-    const { name, email, registration_code, items, category_id } = req.body;
+    const { name, email, registration_code, items, address, phone, category_id } = req.body;
     try {
-      const info = db.prepare("INSERT INTO suppliers (name, email, registration_code, items, category_id) VALUES (?, ?, ?, ?, ?)")
-        .run(name, email, registration_code, items, category_id);
+      const info = db.prepare("INSERT INTO suppliers (name, email, registration_code, items, address, phone, category_id) VALUES (?, ?, ?, ?, ?, ?, ?)")
+        .run(name, email, registration_code, items, address, phone, category_id);
       res.json({ id: info.lastInsertRowid });
     } catch (err: any) {
       res.status(500).json({ error: err.message });

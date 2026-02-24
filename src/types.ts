@@ -9,6 +9,8 @@ export interface Supplier {
   email: string;
   registration_code: string;
   items: string;
+  address?: string;
+  phone?: string;
   category_id: number;
   category_name?: string;
 }
