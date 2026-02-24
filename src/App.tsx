@@ -38,6 +38,8 @@ export default function App() {
     category_id: ''
   });
 
+  const [newCategory, setNewCategory] = useState('');
+
   useEffect(() => {
     fetchCategories();
     fetchSuppliers();
@@ -59,6 +61,25 @@ export default function App() {
     const data = await res.json();
     setSuppliers(data);
     setLoading(false);
+  };
+
+  const handleAddCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCategory.trim()) return;
+    
+    const res = await fetch('/api/categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: newCategory })
+    });
+    if (res.ok) {
+      alert('Categoria cadastrada com sucesso!');
+      setNewCategory('');
+      fetchCategories();
+    } else {
+      const data = await res.json();
+      alert(`Erro: ${data.error || 'Falha ao cadastrar categoria'}`);
+    }
   };
 
   const handleAddSupplier = async (e: React.FormEvent) => {
@@ -279,7 +300,7 @@ export default function App() {
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-md border border-slate-100">
                   <h4 className="text-sm font-bold text-slate-400 uppercase mb-4">Categorias</h4>
-                  <div className="space-y-2">
+                  <div className="space-y-2 mb-6">
                     {categories.map(cat => (
                       <div key={cat.id} className="flex justify-between items-center text-sm">
                         <span>{cat.name}</span>
@@ -288,6 +309,22 @@ export default function App() {
                         </span>
                       </div>
                     ))}
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100">
+                    <h5 className="text-xs font-bold text-slate-400 uppercase mb-3">Nova Categoria</h5>
+                    <form onSubmit={handleAddCategory} className="space-y-2">
+                      <input 
+                        type="text" 
+                        className="input-field text-sm py-1.5" 
+                        placeholder="Nome da categoria"
+                        value={newCategory}
+                        onChange={e => setNewCategory(e.target.value)}
+                      />
+                      <button type="submit" className="btn-primary w-full justify-center py-1.5 text-sm">
+                        Adicionar
+                      </button>
+                    </form>
                   </div>
                 </div>
               </div>
