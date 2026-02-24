@@ -39,7 +39,6 @@ export default function App() {
   });
 
   const [newCategory, setNewCategory] = useState('');
-  const [inlineCategoryName, setInlineCategoryName] = useState('');
 
   useEffect(() => {
     fetchCategories();
@@ -186,7 +185,7 @@ export default function App() {
                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                   <Tag size={14} /> Selecione uma Categoria
                 </h4>
-                <div className="flex flex-wrap gap-x-8 gap-y-3 mb-6">
+                <div className="flex flex-wrap gap-x-8 gap-y-3">
                   <button 
                     onClick={() => setSelectedCategory(null)}
                     className={`text-sm font-medium transition-all relative py-1 ${!selectedCategory ? 'text-brand-accent' : 'text-slate-500 hover:text-brand-deep'}`}
@@ -207,45 +206,29 @@ export default function App() {
                 </div>
 
                 {isAdmin && (
-                  <div className="pt-6 border-t border-slate-100">
-                    <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Cadastrar Nova Categoria</h5>
-                    <form 
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        const name = inlineCategoryName.trim();
-                        if (!name) return;
-                        
-                        fetch('/api/categories', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ name })
-                        }).then(res => res.json()).then(data => {
-                          if (data.id) {
-                            fetchCategories();
-                            setInlineCategoryName('');
-                          } else {
-                            alert('Erro ao criar categoria. Verifique se já existe.');
-                          }
-                        }).catch(() => alert('Erro de conexão com o servidor.'));
+                  <div className="mt-6 pt-4 border-t border-slate-50 flex justify-start">
+                    <button 
+                      onClick={() => {
+                        const name = prompt('Digite o nome da nova categoria:');
+                        if (name && name.trim()) {
+                          fetch('/api/categories', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: name.trim() })
+                          }).then(res => res.json()).then(data => {
+                            if (data.id) {
+                              fetchCategories();
+                              alert('Categoria cadastrada com sucesso!');
+                            } else {
+                              alert('Erro ao criar categoria. Verifique se já existe.');
+                            }
+                          }).catch(() => alert('Erro de conexão com o servidor.'));
+                        }
                       }}
-                      className="flex items-center gap-2"
+                      className="text-xs font-bold text-brand-accent hover:text-brand-deep flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-lg hover:bg-slate-100 transition-all border border-slate-100"
                     >
-                      <input 
-                        type="text" 
-                        placeholder="Ex: Ferramentas, Tintas..."
-                        className="max-w-xs px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-brand-accent/50 text-sm outline-none transition-all"
-                        value={inlineCategoryName}
-                        onChange={(e) => setInlineCategoryName(e.target.value)}
-                      />
-                      <button 
-                        type="submit"
-                        className="bg-brand-accent text-white p-2 rounded-lg hover:bg-brand-deep transition-all shadow-sm flex items-center justify-center"
-                        title="Salvar Categoria"
-                      >
-                        <Plus size={18} />
-                      </button>
-                      <span className="text-[10px] font-medium text-slate-400 italic ml-2">Pressione Enter para salvar</span>
-                    </form>
+                      <Plus size={14} /> Outras Categorias
+                    </button>
                   </div>
                 )}
               </div>
@@ -277,27 +260,39 @@ export default function App() {
                         <Lock size={12} /> Cód: {supplier.registration_code || 'N/A'}
                       </p>
                       
-                      <div className="space-y-3 mb-6">
-                        <div className="flex items-start gap-2 text-sm text-slate-600">
-                          <Package size={16} className="mt-1 shrink-0 text-brand-accent" />
-                          <span>{supplier.items}</span>
+                      <div className="space-y-4 mb-6">
+                        <div className="flex items-start gap-2 text-sm text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                          <Package size={18} className="shrink-0 text-brand-accent" />
+                          <span className="leading-relaxed">{supplier.items}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-slate-600">
-                          <Mail size={16} className="shrink-0 text-brand-accent" />
-                          <span className="truncate">{supplier.email}</span>
+                        
+                        <div className="space-y-2 pt-2 border-t border-slate-100">
+                          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Informações de Contato</h4>
+                          <div className="flex items-center gap-3 text-sm text-slate-700 bg-white p-2 rounded-lg border border-slate-50 shadow-sm">
+                            <div className="bg-brand-accent/10 p-2 rounded-lg text-brand-accent">
+                              <Mail size={16} />
+                            </div>
+                            <span className="truncate font-medium">{supplier.email}</span>
+                          </div>
+                          
+                          {supplier.phone && (
+                            <div className="flex items-center gap-3 text-sm text-slate-700 bg-white p-2 rounded-lg border border-slate-50 shadow-sm">
+                              <div className="bg-emerald-500/10 p-2 rounded-lg text-emerald-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                              </div>
+                              <span className="font-medium">{supplier.phone}</span>
+                            </div>
+                          )}
+                          
+                          {supplier.address && (
+                            <div className="flex items-start gap-3 text-sm text-slate-700 bg-white p-2 rounded-lg border border-slate-50 shadow-sm">
+                              <div className="bg-orange-500/10 p-2 rounded-lg text-orange-600 shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                              </div>
+                              <span className="line-clamp-2 font-medium leading-snug">{supplier.address}</span>
+                            </div>
+                          )}
                         </div>
-                        {supplier.phone && (
-                          <div className="flex items-center gap-2 text-sm text-slate-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-brand-accent"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                            <span>{supplier.phone}</span>
-                          </div>
-                        )}
-                        {supplier.address && (
-                          <div className="flex items-start gap-2 text-sm text-slate-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-1 shrink-0 text-brand-accent"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            <span className="line-clamp-2">{supplier.address}</span>
-                          </div>
-                        )}
                       </div>
                     </div>
 
@@ -344,7 +339,7 @@ export default function App() {
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-md border border-slate-100">
                   <h4 className="text-sm font-bold text-slate-400 uppercase mb-4">Categorias</h4>
-                  <div className="space-y-2 mb-6">
+                  <div className="space-y-2">
                     {categories.map(cat => (
                       <div key={cat.id} className="flex justify-between items-center text-sm">
                         <span>{cat.name}</span>
@@ -353,22 +348,6 @@ export default function App() {
                         </span>
                       </div>
                     ))}
-                  </div>
-
-                  <div className="pt-4 border-t border-slate-100">
-                    <h5 className="text-xs font-bold text-slate-400 uppercase mb-3">Nova Categoria</h5>
-                    <form onSubmit={handleAddCategory} className="space-y-2">
-                      <input 
-                        type="text" 
-                        className="input-field text-sm py-1.5" 
-                        placeholder="Nome da categoria"
-                        value={newCategory}
-                        onChange={e => setNewCategory(e.target.value)}
-                      />
-                      <button type="submit" className="btn-primary w-full justify-center py-1.5 text-sm">
-                        Adicionar
-                      </button>
-                    </form>
                   </div>
                 </div>
               </div>
