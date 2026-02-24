@@ -207,58 +207,45 @@ export default function App() {
                 </div>
 
                 {isAdmin && (
-                  <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
-                    <div className="relative flex-1 max-w-xs">
+                  <div className="pt-6 border-t border-slate-100">
+                    <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Cadastrar Nova Categoria</h5>
+                    <form 
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const name = inlineCategoryName.trim();
+                        if (!name) return;
+                        
+                        fetch('/api/categories', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ name })
+                        }).then(res => res.json()).then(data => {
+                          if (data.id) {
+                            fetchCategories();
+                            setInlineCategoryName('');
+                          } else {
+                            alert('Erro ao criar categoria. Verifique se já existe.');
+                          }
+                        }).catch(() => alert('Erro de conexão com o servidor.'));
+                      }}
+                      className="flex items-center gap-2"
+                    >
                       <input 
                         type="text" 
-                        placeholder="Nova categoria..."
-                        className="w-full pl-3 pr-10 py-1.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-brand-accent/50 text-sm"
+                        placeholder="Ex: Ferramentas, Tintas..."
+                        className="max-w-xs px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-brand-accent/50 text-sm outline-none transition-all"
                         value={inlineCategoryName}
                         onChange={(e) => setInlineCategoryName(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            const name = inlineCategoryName.trim();
-                            if (name) {
-                              fetch('/api/categories', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ name })
-                              }).then(res => res.json()).then(data => {
-                                if (data.id) {
-                                  fetchCategories();
-                                  setInlineCategoryName('');
-                                } else {
-                                  alert('Erro ao criar categoria.');
-                                }
-                              });
-                            }
-                          }
-                        }}
                       />
                       <button 
-                        onClick={() => {
-                          const name = inlineCategoryName.trim();
-                          if (name) {
-                            fetch('/api/categories', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ name })
-                            }).then(res => res.json()).then(data => {
-                              if (data.id) {
-                                fetchCategories();
-                                setInlineCategoryName('');
-                              } else {
-                                alert('Erro ao criar categoria.');
-                              }
-                            });
-                          }
-                        }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-brand-accent hover:text-brand-deep"
+                        type="submit"
+                        className="bg-brand-accent text-white p-2 rounded-lg hover:bg-brand-deep transition-all shadow-sm flex items-center justify-center"
+                        title="Salvar Categoria"
                       >
                         <Plus size={18} />
                       </button>
-                    </div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pressione Enter para salvar</span>
+                      <span className="text-[10px] font-medium text-slate-400 italic ml-2">Pressione Enter para salvar</span>
+                    </form>
                   </div>
                 )}
               </div>
