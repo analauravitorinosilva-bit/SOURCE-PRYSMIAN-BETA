@@ -432,43 +432,17 @@ export default function App() {
                       </div>
                       <div className="space-y-1">
                         <label className="text-sm font-bold text-slate-500">Categoria</label>
-                        <div className="flex gap-2">
-                          <select 
-                            required
-                            className="input-field flex-1"
-                            value={newSupplier.category_id}
-                            onChange={e => setNewSupplier({...newSupplier, category_id: e.target.value})}
-                          >
-                            <option value="">Selecione uma categoria</option>
-                            {categories.map(cat => (
-                              <option key={cat.id} value={cat.id}>{cat.name}</option>
-                            ))}
-                          </select>
-                          <button 
-                            type="button"
-                            onClick={() => {
-                              const name = prompt('Nome da nova categoria:');
-                              if (name) {
-                                fetch('/api/categories', {
-                                  method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({ name })
-                                }).then(res => res.json()).then(data => {
-                                  if (data.id) {
-                                    fetchCategories();
-                                    setNewSupplier(prev => ({ ...prev, category_id: data.id.toString() }));
-                                  } else {
-                                    alert('Erro ao criar categoria. Verifique se já existe.');
-                                  }
-                                });
-                              }
-                            }}
-                            className="bg-slate-100 p-2 rounded-lg text-brand-accent hover:bg-brand-accent hover:text-white transition-all"
-                            title="Nova Categoria"
-                          >
-                            <Plus size={20} />
-                          </button>
-                        </div>
+                        <select 
+                          required
+                          className="input-field"
+                          value={newSupplier.category_id}
+                          onChange={e => setNewSupplier({...newSupplier, category_id: e.target.value})}
+                        >
+                          <option value="">Selecione uma categoria</option>
+                          {categories.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
 
