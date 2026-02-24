@@ -39,6 +39,7 @@ export default function App() {
   });
 
   const [newCategory, setNewCategory] = useState('');
+  const [inlineCategoryName, setInlineCategoryName] = useState('');
 
   useEffect(() => {
     fetchCategories();
@@ -185,7 +186,7 @@ export default function App() {
                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                   <Tag size={14} /> Selecione uma Categoria
                 </h4>
-                <div className="flex flex-wrap gap-x-8 gap-y-3">
+                <div className="flex flex-wrap gap-x-8 gap-y-3 mb-6">
                   <button 
                     onClick={() => setSelectedCategory(null)}
                     className={`text-sm font-medium transition-all relative py-1 ${!selectedCategory ? 'text-brand-accent' : 'text-slate-500 hover:text-brand-deep'}`}
@@ -203,31 +204,63 @@ export default function App() {
                       {selectedCategory === cat.id && <motion.div layoutId="cat-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-accent rounded-full" />}
                     </button>
                   ))}
-                  
-                  {isAdmin && (
-                    <button 
-                      onClick={() => {
-                        const name = prompt('Nome da nova categoria:');
-                        if (name) {
-                          fetch('/api/categories', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ name })
-                          }).then(res => res.json()).then(data => {
-                            if (data.id) {
-                              fetchCategories();
-                            } else {
-                              alert('Erro ao criar categoria.');
-                            }
-                          });
-                        }
-                      }}
-                      className="text-sm font-bold text-brand-accent hover:text-brand-deep flex items-center gap-1 py-1"
-                    >
-                      <Plus size={14} /> Nova
-                    </button>
-                  )}
                 </div>
+
+                {isAdmin && (
+                  <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
+                    <div className="relative flex-1 max-w-xs">
+                      <input 
+                        type="text" 
+                        placeholder="Nova categoria..."
+                        className="w-full pl-3 pr-10 py-1.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-brand-accent/50 text-sm"
+                        value={inlineCategoryName}
+                        onChange={(e) => setInlineCategoryName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            const name = inlineCategoryName.trim();
+                            if (name) {
+                              fetch('/api/categories', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ name })
+                              }).then(res => res.json()).then(data => {
+                                if (data.id) {
+                                  fetchCategories();
+                                  setInlineCategoryName('');
+                                } else {
+                                  alert('Erro ao criar categoria.');
+                                }
+                              });
+                            }
+                          }
+                        }}
+                      />
+                      <button 
+                        onClick={() => {
+                          const name = inlineCategoryName.trim();
+                          if (name) {
+                            fetch('/api/categories', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ name })
+                            }).then(res => res.json()).then(data => {
+                              if (data.id) {
+                                fetchCategories();
+                                setInlineCategoryName('');
+                              } else {
+                                alert('Erro ao criar categoria.');
+                              }
+                            });
+                          }
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-brand-accent hover:text-brand-deep"
+                      >
+                        <Plus size={18} />
+                      </button>
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pressione Enter para salvar</span>
+                  </div>
+                )}
               </div>
             </div>
 
